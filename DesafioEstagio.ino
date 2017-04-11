@@ -1,64 +1,63 @@
-// Declarações
-int led = 10; // Led no pino 10 pwm
-int button = 2; // Botão no pino digital 2
-bool fade = false; // Variavel boleana para ativar e desativar o programa
+
+int led = 10; // Led in pino 10 pwm
+int button = 2; // Button in pino digital 2
+bool fade = false; // bool variable to activate and deactivate the fade
 int buttonState = 0;
 
 void setup() {
   Serial.begin(9600);
   pinMode(led, OUTPUT);
   pinMode(button, INPUT);
-  // Define a função de interrupção a ser chamada 
-  // toda vez que o bottão muda de HIGH para LOW
+  // Define the function to be called when an interruption (push button) 
+  // It happens everytime the button changes from high to low
   attachInterrupt(0, interrupt_toogle, FALLING);
   loop();
 }
 
 void loop() {
   int startFadeValue = 0;
-  // Quando receber valor serial, set startFadeValue
   while (Serial.available() > 0) {
     startFadeValue = Serial.parseInt();
     if(startFadeValue < 255){
       delay(30);  
     }else{
-      Serial.println("Valor fora da escala, precisa ser < 255!");
+      Serial.println("Value out of range, it needs to be < 255!");
     }
   };
 
-  // Ativa somente quando o botão for acionado
+  // When the button is pressed
   if(fade){
     Serial.println("Fade In");
-    // Incrementa o brilho do led em 20%
+    // Brights up the led in 20%
     for (int fadeValue = startFadeValue ; fadeValue <= 255; fadeValue += 51) {
       analogWrite(led, fadeValue);
       print_voltage();
-      // Espera 1segundo
+      // Wait 1 second
       delay(1000);
     }
   
     Serial.println("Fade Out");
-    // Decrementa o brilho do led em 20%
+    // Brights down the led in 20%
     for (int fadeValue = 255 ; fadeValue >= 0; fadeValue -= 51) {
       analogWrite(led, fadeValue);
       print_voltage();
-      // Espera 1 segundo
+      // Wait 1 seconde
       delay(1000);
     }
   }
 }
 
-// Ativa ou desativa o fade do led
+// Function to activate or deactivate the fadding
 void interrupt_toogle() {
-  buttonState = digitalRead(button); // Muda o estado do botão qdo precionado
-  fade = !fade; // Inverte o valor do fade 
-  Serial.println("Voce apertou o botao!");
+  buttonState = digitalRead(button); // Changes the button state
+  fade = !fade;  
+  Serial.println("You pressed the button!");
 }
 
 void print_voltage(){
-  // Lê o valor do pino analogico
+  // Reads the value of the analog pin
   int sensorValue = analogRead(A0);
-  // Converte a leitura analogica em voltagem
+  // Converts the value to voltage
   float voltage = sensorValue * (5.0 / 1023.0);
   Serial.println(voltage);
 }
