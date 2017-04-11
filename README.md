@@ -1,1 +1,3 @@
-# Fade Led with Push Button on Arduino
+# PushFade
+
+A program to make a led fade with an push button activation. 
